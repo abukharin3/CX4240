@@ -6,7 +6,7 @@ class BrickSetSpider(scrapy.Spider):
 
     def song_parse(self, response):
         print(response)
-         SET_SELECTOR = 'p,lyrics ::text'
+        SET_SELECTOR = 'p,lyrics ::text'
         print(response.css(SET_SELECTOR).extract_first())
 
                 
