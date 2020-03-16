@@ -6,15 +6,9 @@ class BrickSetSpider(scrapy.Spider):
 
     def song_parse(self, response):
         print(response)
-        SET_SELECTOR = 'lyrics'
+         SET_SELECTOR = 'p,lyrics ::text'
+        print(response.css(SET_SELECTOR).extract_first())
 
-        with open("genius.text", "a") as file:
-            for song in response.css(SET_SELECTOR):
-                print("\n\n\n")
-                print(type(song))
-                print("\n\n\n")
-                #NAME_SELECTOR = 'p ::text'
-                #file.writelines(song.css(NAME_SELECTOR).extract())
                 
 
     def parse(self, response):
