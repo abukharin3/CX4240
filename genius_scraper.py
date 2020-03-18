@@ -1,5 +1,9 @@
 import scrapy
 
+#TEST UPDATE
+
+print('test update')
+
 class BrickSetSpider(scrapy.Spider):
     name = "brickset_spider"
     start_urls = ['https://genius.com/songs/all?page=1']#,'https://genius.com/songs/all?page=2']
