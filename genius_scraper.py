@@ -1,11 +1,5 @@
 import scrapy
 
-#Matt Test tests tes tse tset se tset sese
-
-#TEST UPDATE
-
-print('test update')
-
 class BrickSetSpider(scrapy.Spider):
     name = "brickset_spider"
     start_urls = ['https://genius.com/songs/all?page=1']#,'https://genius.com/songs/all?page=2']
@@ -46,5 +40,3 @@ class BrickSetSpider(scrapy.Spider):
             callback=self.song_parse,
         )
 
-
-#Alex change
