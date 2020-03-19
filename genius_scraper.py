@@ -5,9 +5,10 @@ class BrickSetSpider(scrapy.Spider):
     start_urls = ['https://genius.com/songs/all?page=1']#,'https://genius.com/songs/all?page=2']
 
     def song_parse(self, response):
-        print("!!!!!!!!!!!!!!!!!!!!")
+        print("\n\n\n")
         SET_SELECTOR = 'p,lyrics ::text'
         print(response.css(SET_SELECTOR).extract_first())
+        print("\n\n\n")
         #print()
 
         # with open("genius.text", "a") as file:
@@ -34,9 +35,10 @@ class BrickSetSpider(scrapy.Spider):
 
         print("\n\n\n")
         # Use top 50 songs
-        link = song_list[0]
-        yield scrapy.Request(
-            response.urljoin(link),
-            callback=self.song_parse,
-        )
+        for link in song_list[2 : 3]:
+            if song_list:
+                yield scrapy.Request(
+                    response.urljoin(link),
+                    callback=self.song_parse,
+                )
 
