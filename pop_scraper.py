@@ -2,7 +2,7 @@ import scrapy
 
 class BrickSetSpider(scrapy.Spider):
     name = "brickset_spider"
-    start_urls = ['https://genius.com/tags/pop/all?page=' + str(i) for i in range(1, 20)]#,'https://genius.com/songs/all?page=2']
+    start_urls = ['https://genius.com/tags/pop/all?page=' + str(i) for i in range(1, 51)]#,'https://genius.com/songs/all?page=2']
 
     def song_parse(self, response):
         SET_SELECTOR = '.lyrics'
@@ -15,7 +15,7 @@ class BrickSetSpider(scrapy.Spider):
 
 
     def parse(self, response):
-        with open("pop_songs.text", "w") as file:
+        with open("pop_songs.text", "a") as file:
             pass
 
         song_list = []
