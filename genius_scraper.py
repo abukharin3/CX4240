@@ -11,14 +11,15 @@ class BrickSetSpider(scrapy.Spider):
         with open("genius.text", "a") as file:
             for song in response.css(SET_SELECTOR):
                 NAME_SELECTOR = 'p ::text'
+                file.writelines(["\n\n\nStart of song \n\n\n"])
                 file.writelines(song.css(NAME_SELECTOR).extract())
 
-                
+
 
     def parse(self, response):
         with open("genius.text", "w") as file:
             pass
-        
+
         song_list = []
 
         NEXT_PAGE_SELECTOR = 'a ::attr(href)'
@@ -35,8 +36,8 @@ class BrickSetSpider(scrapy.Spider):
 
         print("\n\n\n")
         # Use top 50 songs
-        
-        for link in song_list[2 : 3]:
+
+        for link in song_list:
             if song_list:
                 yield scrapy.Request(
                     response.urljoin(link),
