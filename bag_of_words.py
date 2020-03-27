@@ -69,11 +69,13 @@ for path in paths:
 # Get rid of words with only one occurence
 new_dict = {"<unk>": 0}
 for word in vocab_dict.keys():
-    if vocab_dict[word] == 1:
+    if vocab_dict[word] <= 2:
         new_dict["<unk>"] += 1
     else:
         new_dict[word] = vocab_dict[word]
 vocab_list = list(new_dict.keys())
+# x = sorted(new_dict, key = lambda x : new_dict[x])
+# print([(a, new_dict[a]) for a in x])
 
 #Turn song list into a matrix
 data = []
@@ -86,5 +88,9 @@ for song in song_list:
 data = np.array(data)
 
 np.save("training_songs.npy", data) # [num songs, genre, vec]
+for i in range(len(vocab_list)):
+    vocab_list[i] = vocab_list[i] + " "
 with open("training_vocab.txt", "w") as file:
     file.writelines(vocab_list)
+
+
