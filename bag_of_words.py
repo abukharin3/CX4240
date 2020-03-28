@@ -69,7 +69,7 @@ for path in paths:
 # Get rid of words with only one occurence
 new_dict = {"<unk>": 0}
 for word in vocab_dict.keys():
-    if vocab_dict[word] <= 0:
+    if vocab_dict[word] <= 4:
         new_dict["<unk>"] += 1
     else:
         new_dict[word] = vocab_dict[word]
