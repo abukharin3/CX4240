@@ -11,6 +11,7 @@ class NaiveBayes:
         self.genres = genres
         self.vocab_len = len(self.data[0][1])
         self.probs = self.learn_parameters() # [genres, vocabulary]
+        self.count = self.get_count()
 
     def learn_parameters(self):
         '''
@@ -26,8 +27,13 @@ class NaiveBayes:
         probs *= 1 / (800 + self.vocab_len)
         return probs
 
+    def get_count(self):
+        counts = np.sum(self.probs, axis = 0) * (800 + self.vocab_len)
+        return counts
+
+
     def predict(self, song):
-        # Song should be in bag of words form with the same vocab
+ # Song should be in bag of words form with the same vocab
         song = np.array(song)
         category = np.zeros(len(self.genres))
         for j in self.genres:
@@ -60,3 +66,4 @@ for i in test_songs:
     if i[0] == nb.predict(i[1]):
         success[i[0]] += 1
 print(np.array(success) / 200)
+print(sum(success) / 1000)
