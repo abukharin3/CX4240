@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pylab as plt
 # Load data
-path_country = r"C:\Users\Alexander\Downloads\country_songs.txt"
-path_pop = r"C:\Users\Alexander\Downloads\pop_songs.txt"
-path_rap = r"C:\Users\Alexander\Downloads\rap_songs.txt"
-path_rnb = r"C:\Users\Alexander\Downloads\rnb_songs.txt"
-path_rock = r"C:\Users\Alexander\Downloads\rock_songs.txt"
+path_country = r"C:/Users/mwrep/OneDrive/Documents/CX_4240/CX4240/data/country_songs.text" #r"C:\Users\Alexander\Downloads\country_songs.txt"
+path_pop = r"C:/Users/mwrep/OneDrive/Documents/CX_4240/CX4240/data/pop_songs.text" #r"C:\Users\Alexander\Downloads\pop_songs.txt"
+path_rap = r"C:/Users/mwrep/OneDrive/Documents/CX_4240/CX4240/data/rap_songs.text" #r"C:\Users\Alexander\Downloads\rap_songs.txt"
+path_rnb = r"C:/Users/mwrep/OneDrive/Documents/CX_4240/CX4240/data/rnb_songs.text" #r"C:\Users\Alexander\Downloads\rnb_songs.txt"
+path_rock = r"C:/Users/mwrep/OneDrive/Documents/CX_4240/CX4240/data/rock_songs.text" #r"C:\Users\Alexander\Downloads\rock_songs.txt"
 paths = [path_country, path_pop, path_rap, path_rnb, path_rock]
 
 
