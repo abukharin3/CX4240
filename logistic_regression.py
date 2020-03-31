@@ -18,9 +18,25 @@ class LogisticRegression:
 		includes a bias) to the theta_list.
 		'''
 		for k in range(len(genres)):
-			#initialize the theta vector
-			theta = np.zeros(self.vec_size + 1) + 0.5
-			#need to find a way to stop descent other than hardcoding
+			print("training genre " + str(k))
+			#initialize the theta vector randomly
+			theta = np.random.rand(self.vec_size + 1)
+
+			#stochastic gradient descent
+			for i in range(len(self.data)):
+				word_vec = np.insert(self.data[i][1],0,1)
+				product = vector_multiplication(word_vec, theta)
+				h_theta = sigmoid(product)
+				loss = h_theta - (self.data[i][0] == genres[k])
+				alpha = 0.1 #learning rate
+				for j in range(len(theta)):
+					theta[j] = theta[j] - (alpha * loss * word_vec[j])
+				#print(temp_theta)
+				#print(np.linalg.norm(temp_theta - theta)) #print differene in theta
+			print(theta)
+
+			'''
+			#batch gradient descent 
 			count = 0
 			while (count < 10):
 				print("The count is " + str(count))
@@ -36,7 +52,6 @@ class LogisticRegression:
 				#adjust theta
 				alpha = 0.01 #learning rate
 				for j in range(len(theta)):
-					print(j)
 					total_loss = 0
 					for i in range(len(self.data)):
 						word_vec = np.insert(self.data[i][1],0,1)
@@ -44,6 +59,8 @@ class LogisticRegression:
 					theta[j] = theta[j] - (alpha * total_loss)
 				#this is the makeshift way to stop the descent, add to the counter (will change later)
 				count += 1
+			'''
+
 			self.theta_list.append(theta)
 
 	def predict(self, song):
@@ -53,11 +70,11 @@ class LogisticRegression:
 		'''
 		song = np.array(song)
 		#include bias
-		song = np.insert(son,0,1)
+		song = np.insert(song,0,1)
 		prediction_list = []
 		#calculate sigmoid at each genre
-		for i in range(len(theta_list)):
-			product = vector_multiplication(song,theta_list[i])
+		for i in range(len(self.theta_list)):
+			product = vector_multiplication(song,self.theta_list[i])
 			prediction_list.append(sigmoid(product))
 		#returns the index of the genre list that has highest probability
 		return prediction_list.index(max(prediction_list))
@@ -87,6 +104,7 @@ lr.learn_parameters()
 # Test the model
 test_path = r"C:\Users\mwrep\OneDrive\Documents\CX_4240\test_songs.npy"
 test_songs = np.load(test_path, allow_pickle = True)
+
 success = 0
 failure = 0
 for i in range(len(test_songs)):
@@ -95,4 +113,4 @@ for i in range(len(test_songs)):
 	else:
 		failure += 1
 
-print(success/(success+failure))
+print("Accuray: " + str(success/(success+failure)))
