@@ -25,6 +25,7 @@ lamb, Q = np.linalg.eig(cov)
 
 #find the highest eigenvalues
 k = 40 #choose the number of columns to keep
+'''
 lamb_indices = []
 for j in range(k):
     for i in range(len(lamb)):
@@ -32,12 +33,12 @@ for j in range(k):
             temp_i = i
     lamb[temp_i] = np.amin(lamb)
     lamb_indices.append(temp_i)
-
+'''
 #make a matrix with strongest eigenvectors
 Q_hat = np.empty((len(Q),k))
 for i in range(len(Q)):
     count = 0
-    for j in lamb_indices:
+    for j in range(k):
         Q_hat[i][count] = Q[i][j]
         count += 1
 
