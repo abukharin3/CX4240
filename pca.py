@@ -54,7 +54,7 @@ test_songs = np.load(test_path, allow_pickle = True)
 test_vec_list = []
 for i in range(len(test_songs)):
 	test_vec_list.append(test_songs[i][1])
-test_matrix = np.array(vec_list)
+test_matrix = np.array(test_vec_list)
 test_matrix_hat = np.matmul(test_matrix,Q_hat)
 
 #unpack/repack the train matrix
