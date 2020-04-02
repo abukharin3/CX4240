@@ -11,9 +11,10 @@ class MLP(Model):
         super(MLP, self).__init__()
         # Define training parameters
         self.learning_rate = 0.01
-        self.training_steps = 20
+        self.training_steps = 2000
         self.num_batches = 40
-        self.display_step = 1
+        self.display_step = 100
+        self.num_epochs = 3
         self.train = train
         self.train_labels = train_labels
         self.test = test
@@ -23,7 +24,6 @@ class MLP(Model):
         # Define hidden layers
         self.fc1 = layers.Dense(len(self.train[0]), activation = tf.nn.relu)
         self.fc2 = layers.Dense(256, activation = tf.nn.relu)
-        self.fc3 = layers.Dense(256, activation = tf.nn.relu)
         self.out = layers.Dense(self.num_genres, activation = tf.nn.relu)
         # Define Optimizer
         self.optimizer = tf.optimizers.Adam(self.learning_rate)
@@ -32,7 +32,6 @@ class MLP(Model):
     def call(self, x, is_training = False):
         x = self.fc1(x)
         x = self.fc2(x)
-        x = self.fc3(x)
         x = self.out(x)
         if not is_training:
             # Training expects logits so we do not apply softmax
@@ -67,16 +66,18 @@ class MLP(Model):
         self.optimizer.apply_gradients(zip(gradients, trainable_variables))
 
     def train_op(self):
-        for b in range(self.num_batches):
-            batch_x = self.train[self.num_batches * b: self.num_batches * (b + 1)]
-            batch_y = self.train_labels[self.num_batches * b: self.num_batches * (b + 1)]
-            for step in range(self.training_steps):
-                self.run_optimization(batch_x, batch_y)
-                if step % self.display_step == 0:
-                    pred = self.call(self.train, is_training = True)
-                    loss = self.cross_entropy_loss(pred, self.train_labels)
-                    acc = self.accuracy(pred, loss)
-                    print("step: %i, loss: %f, accuracy: %f" % (step, loss, acc))
+        for e in range(self.num_epochs):
+            self.shuffle()
+            for b in range(self.num_batches):
+                batch_x = self.train[self.num_batches * b: self.num_batches * (b + 1)]
+                batch_y = self.train_labels[self.num_batches * b: self.num_batches * (b + 1)]
+                for step in range(self.training_steps):
+                    self.run_optimization(batch_x, batch_y)
+                    if step % self.display_step == 0:
+                        pred = self.call(self.train, is_training = True)
+                        loss = self.cross_entropy_loss(pred, self.train_labels)
+                        acc = self.accuracy(pred, loss)
+                        print("step: %i, loss: %f, accuracy: %f, epoch: %f, batch: %f" % (step, loss, acc, e, b))
 
 
     def shuffle(self):
@@ -86,8 +87,8 @@ class MLP(Model):
         self.test, self.test_labels = self.test[test_order], self.test_labels[test_order]
 
 #Load Data
-train_path = r"C:\Users\Alexander\Documents\training_songs.npy"
-test_path = r"C:\Users\Alexander\Downloads\test_songs.npy"
+train_path = r"C:\Users\Alexander\Downloads\reduced_training_songs.npy"
+test_path = r"C:\Users\Alexander\Downloads\reduced_test_songs.npy"
 
 test_songs = np.load(test_path, allow_pickle = True)
 train_songs = np.load(train_path, allow_pickle = True)
@@ -108,6 +109,8 @@ for y in test_songs:
     test_labels.append(y[0])
 test = np.array(test)
 test_labels = np.array(test_labels)
+
+
 print(len(train_labels))
 print("End Data Processing")
 mlp = MLP(train = train, train_labels = train_labels, test = test, test_labels = test_labels)
