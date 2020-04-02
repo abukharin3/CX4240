@@ -33,7 +33,7 @@ class NaiveBayes:
 
 
     def predict(self, song):
- # Song should be in bag of words form with the same vocab
+    # Song should be in bag of words form with the same vocab
         song = np.array(song)
         category = np.zeros(len(self.genres))
         for j in self.genres:
@@ -46,7 +46,7 @@ class NaiveBayes:
 
 
 # Train the model
-train_path = r"C:\Users\Alexander\Documents\training_songs.npy"
+train_path = r"C:\Users\Alexander\Downloads\training_songs.npy"
 train_songs = np.load(train_path, allow_pickle = True)
 genres = [0, 1, 2, 3, 4] # Country, pop, rap, rnb, rock
 
