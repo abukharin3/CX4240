@@ -1,40 +1,35 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model, layers
+import gc
 
-class MLP(Model):
-    '''
-    Multi-layer perceptron for text
-    classification
-    '''
-    def __init__(self, train, train_labels, test, test_labels):
-        super(MLP, self).__init__()
+class LSTM(Model):
+    def __init__(self, train, train_labels):
+        super(LSTM, self).__init__()
         # Define training parameters
         self.learning_rate = 0.01
-        self.training_steps = 20000
-        self.num_batches = 1000
-        self.display_step = 1000
-        self.num_epochs = 10
+        self.training_steps = 2000
+        self.num_batches = 50
+        self.display_step = 1
+        self.num_epochs = 3
         self.train = train
         self.train_labels = train_labels
-        self.test = test
-        self.test_labels = test_labels
+
         self.shuffle()
         self.num_genres = 5
+        self.num_units = 32
         # Define hidden layers
-        self.fc1 = layers.Dense(len(self.train[0]), activation = tf.nn.relu)
-        self.fc2 = layers.Dense(256, activation = tf.nn.relu)
-        self.out = layers.Dense(self.num_genres, activation = tf.nn.relu)
+        self.lstm_layer = layers.LSTM(units = self.num_units)
+        self.out = layers.Dense(self.num_genres)
         # Define Optimizer
         self.optimizer = tf.optimizers.Adam(self.learning_rate)
 
-    # Forward pass
     def call(self, x, is_training = False):
-        x = self.fc1(x)
-        x = self.fc2(x)
+        # Forward pass
+        x = self.lstm_layer(x)
         x = self.out(x)
         if not is_training:
-            # Training expects logits so we do not apply softmax
+            # Give softmax ouput if not training, otherwise keep logits
             x = tf.nn.softmax(x)
         return x
 
@@ -61,15 +56,16 @@ class MLP(Model):
 
         # Compute Gradients
         gradients = g.gradient(loss, trainable_variables)
+
         # Update Variables
         self.optimizer.apply_gradients(zip(gradients, trainable_variables))
 
     def train_op(self):
         for e in range(self.num_epochs):
-            self.shuffle()
-            for b in range(20):
-                batch_x = self.train[self.num_batches * b: self.num_batches * (b + 1)]
-                batch_y = self.train_labels[self.num_batches * b: self.num_batches * (b + 1)]
+            order = self.shuffle()
+            for b in range(10):
+                batch_x = self.train[order][self.num_batches * b: self.num_batches * (b + 1)]
+                batch_y = self.train_labels[order][self.num_batches * b: self.num_batches * (b + 1)]
                 for step in range(self.training_steps):
                     self.run_optimization(batch_x, batch_y)
                     if step % self.display_step == 0:
@@ -78,39 +74,17 @@ class MLP(Model):
                         acc = self.accuracy(pred, batch_y)
                         print("step: %i, loss: %f, accuracy: %f, epoch: %f, batch: %f" % (step, loss, acc, e, b))
 
-
     def shuffle(self):
         train_order = np.random.permutation(len(self.train))
-        self.train, self.train_labels = self.train[train_order], self.train_labels[train_order]
-        test_order = np.random.permutation(len(self.test))
-        self.test, self.test_labels = self.test[test_order], self.test_labels[test_order]
-
-#Load Data
-train_path = r"C:\Users\Alexander\Downloads\reduced_training_songs.npy"
-test_path = r"C:\Users\Alexander\Downloads\reduced_test_songs.npy"
-
-test_songs = np.load(test_path, allow_pickle = True)
-train_songs = np.load(train_path, allow_pickle = True)
-
-# Separate labels from data
-train = []
-train_labels = []
-for x in train_songs:
-    train.append(x[1])
-    train_labels.append(x[0])
-train = np.array(train)
-train_labels = np.array(train_labels)
-
-test_labels = []
-test = []
-for y in test_songs:
-    test.append(y[1])
-    test_labels.append(y[0])
-test = np.array(test)
-test_labels = np.array(test_labels)
+        return train_order
 
 
-print(len(train_labels))
+
+
+# Load Data
+data = np.load("wordvecs.npy")
+labels = np.load("wordvec_labels.npy")
+data = data[:, 0:2000, :]
 print("End Data Processing")
-mlp = MLP(train = train, train_labels = train_labels, test = test, test_labels = test_labels)
-mlp.train_op()
+lstm = LSTM(train = data, train_labels = labels)
+lstm.train_op()
