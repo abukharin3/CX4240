@@ -55,18 +55,14 @@ for path in paths:
             if word:
                 song_list[song_index].append(word)
 
-# Find max length of a song
-maxl = 0
-for song in song_list:
-    if len(song) > maxl:
-        maxl = len(song)
+# Only use first 100 wors of song
 song_vecs = []
-labels = np.array([i // 100 for i in range(500)])
+labels = np.array([i // 800 for i in range(4000)])
 for num in range(5):
     print(num)
-    for song in song_list[num*1000: num *1000 + 100]:
+    for song in song_list[num*1000: num *1000 + 800]:
         song_seq = []
-        for i in range(maxl):
+        for i in range(100):
             if i > len(song) - 1:
                 song_seq.append(np.zeros(300))
             else:
@@ -76,6 +72,27 @@ for num in range(5):
                     song_seq.append(np.zeros(300))
         song_vecs.append(np.array(song_seq))
 gc.collect()
+
 song_vecs = np.array(song_vecs)
 np.save("wordvecs.npy", song_vecs)
 np.save("wordvec_labels.npy", labels)
+
+test_labels = np.array([i // 100 for i in range(500)])
+test_vecs = []
+for num in range(5):
+    print(num)
+    for song in song_list[(num + 1) * 800: (num + 1) * 800 + 100]:
+        song_seq = []
+        for i in range(100):
+            if i > len(song) - 1:
+                song_seq.append(np.zeros(300))
+            else:
+                try:
+                    song_seq.append(model[song[i]])
+                except:
+                    song_seq.append(np.zeros(300))
+        test_vecs.append(np.array(song_seq))
+gc.collect()
+test_vecs = np.array(test_vecs)
+np.save("testvecs.npy", test_vecs)
+np.save("test_labels.npy", test_labels)

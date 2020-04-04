@@ -1,2 +1,4 @@
 wordvec_labels.npy
 wordvecs.npy
+testvecs.npy
+test_labels.npy

@@ -4,21 +4,24 @@ from tensorflow.keras import Model, layers
 import gc
 
 class LSTM(Model):
-    def __init__(self, train, train_labels):
+    def __init__(self, train, train_labels, test, test_labels):
         super(LSTM, self).__init__()
         # Define training parameters
-        self.learning_rate = 0.01
-        self.training_steps = 2000
-        self.num_batches = 50
-        self.display_step = 1
+        self.learning_rate = 0.001
+        self.training_steps = 1000
+        self.batch_size = 500
+        self.display_step = 10
         self.num_epochs = 3
         self.train = train
         self.train_labels = train_labels
+        self.test = test
+        self.test_labels = test_labels
 
         self.shuffle()
         self.num_genres = 5
         self.num_units = 32
         # Define hidden layers
+        self.fc1 = layers.Dense(len(self.train[0]), activation = tf.nn.relu)
         self.lstm_layer = layers.LSTM(units = self.num_units)
         self.out = layers.Dense(self.num_genres)
         # Define Optimizer
@@ -26,6 +29,7 @@ class LSTM(Model):
 
     def call(self, x, is_training = False):
         # Forward pass
+        x = self.fc1(x)
         x = self.lstm_layer(x)
         x = self.out(x)
         if not is_training:
@@ -62,21 +66,24 @@ class LSTM(Model):
 
     def train_op(self):
         for e in range(self.num_epochs):
-            order = self.shuffle()
-            for b in range(10):
-                batch_x = self.train[order][self.num_batches * b: self.num_batches * (b + 1)]
-                batch_y = self.train_labels[order][self.num_batches * b: self.num_batches * (b + 1)]
+            self.shuffle()
+            for b in range(8):
+                batch_x = self.train[self.batch_size * b: self.batch_size * (b + 1)]
+                batch_y = self.train_labels[self.batch_size * b: self.batch_size * (b + 1)]
                 for step in range(self.training_steps):
                     self.run_optimization(batch_x, batch_y)
                     if step % self.display_step == 0:
                         pred = self.call(batch_x, is_training = True)
                         loss = self.cross_entropy_loss(pred, batch_y)
                         acc = self.accuracy(pred, batch_y)
+                        test_pred = self.call(self.test, is_training = True)
+                        test_acc = self.accuracy(test_pred, self.test_labels)
                         print("step: %i, loss: %f, accuracy: %f, epoch: %f, batch: %f" % (step, loss, acc, e, b))
+                        print("Test Accuracy: %f" % (test_acc))
 
     def shuffle(self):
         train_order = np.random.permutation(len(self.train))
-        return train_order
+        self.train, self.train_labels = self.train[train_order], self.train_labels[train_order]
 
 
 
@@ -84,7 +91,11 @@ class LSTM(Model):
 # Load Data
 data = np.load("wordvecs.npy")
 labels = np.load("wordvec_labels.npy")
-data = data[:, 0:2000, :]
+test = np.load("testvecs.npy")
+test_labels = np.load("test_labels.npy")
+
+data = data[:, 0:100, :]
 print("End Data Processing")
-lstm = LSTM(train = data, train_labels = labels)
+
+lstm = LSTM(train = data, train_labels = labels, test = test, test_labels = test_labels)
 lstm.train_op()

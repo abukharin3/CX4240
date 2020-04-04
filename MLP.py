@@ -10,11 +10,11 @@ class MLP(Model):
     def __init__(self, train, train_labels, test, test_labels):
         super(MLP, self).__init__()
         # Define training parameters
-        self.learning_rate = 0.01
+        self.learning_rate = 0.001
         self.training_steps = 20000
-        self.num_batches = 1000
-        self.display_step = 1000
-        self.num_epochs = 10
+        self.batch_size = 1000
+        self.display_step = 500
+        self.num_epochs = 3
         self.train = train
         self.train_labels = train_labels
         self.test = test
@@ -24,7 +24,7 @@ class MLP(Model):
         # Define hidden layers
         self.fc1 = layers.Dense(len(self.train[0]), activation = tf.nn.relu)
         self.fc2 = layers.Dense(256, activation = tf.nn.relu)
-        self.out = layers.Dense(self.num_genres, activation = tf.nn.relu)
+        self.out = layers.Dense(self.num_genres, activation = tf.nn.sigmoid)
         # Define Optimizer
         self.optimizer = tf.optimizers.Adam(self.learning_rate)
 
@@ -41,7 +41,7 @@ class MLP(Model):
     # Define Cross entropy loss
     def cross_entropy_loss(self, pred, y):
         loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels = y, logits = pred)
-        return tf.reduce_mean(loss)
+        return tf.reduce_mean(loss + 1e-3)
 
     def accuracy(self, y_pred, label):
         # Take argmax of prediction
@@ -67,16 +67,19 @@ class MLP(Model):
     def train_op(self):
         for e in range(self.num_epochs):
             self.shuffle()
-            for b in range(20):
-                batch_x = self.train[self.num_batches * b: self.num_batches * (b + 1)]
-                batch_y = self.train_labels[self.num_batches * b: self.num_batches * (b + 1)]
+            for b in range(4):
+                batch_x = self.train[self.batch_size * b: self.batch_size * (b + 1)]
+                batch_y = self.train_labels[self.batch_size * b: self.batch_size * (b + 1)]
                 for step in range(self.training_steps):
                     self.run_optimization(batch_x, batch_y)
                     if step % self.display_step == 0:
                         pred = self.call(batch_x, is_training = True)
                         loss = self.cross_entropy_loss(pred, batch_y)
                         acc = self.accuracy(pred, batch_y)
+                        test_pred = self.call(self.test, is_training = True)
+                        test_acc = self.accuracy(test_pred, self.test_labels)
                         print("step: %i, loss: %f, accuracy: %f, epoch: %f, batch: %f" % (step, loss, acc, e, b))
+                        print("Test Accuracy: %f" % (test_acc))
 
 
     def shuffle(self):
