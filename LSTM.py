@@ -77,7 +77,7 @@ class LSTM(Model):
                     if step % self.display_step == 0:
                         pred = self.call(self.train, is_training = True)
                         loss = self.cross_entropy_loss(pred, self.train_labels)
-                        acc = self.accuracy(pred, loss)
+                        acc = self.accuracy(pred, self.train_labels)
                         print("step: %i, loss: %f, accuracy: %f, epoch: %f, batch: %f" % (step, loss, acc, e, b))
 
 
